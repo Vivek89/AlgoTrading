@@ -3,14 +3,11 @@ FROM python:3.12-slim as builder
 
 WORKDIR /tmp
 
-# Install poetry
-RUN pip install poetry
+# Install uv
+RUN pip install uv
 
-# Copy only dependency files to cache them in docker layer
-COPY pyproject.toml poetry.lock* /tmp/
-
-# Generate requirements.txt from poetry (safer for production builds than running poetry inside)
-RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
+# Copy pyproject.toml and UV lock file
+COPY pyproject.toml uv.lock* /tmp/
 
 # Stage 2: Runtime
 FROM python:3.12-slim
@@ -23,11 +20,14 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements from builder stage
-COPY --from=builder /tmp/requirements.txt /code/requirements.txt
+# Install uv
+RUN pip install uv
 
-# Install dependencies
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+# Copy pyproject.toml and lock file from builder
+COPY --from=builder /tmp/pyproject.toml /tmp/uv.lock* /code/
+
+# Install dependencies with uv
+RUN cd /code && uv sync --frozen --all-extras --no-venv
 
 # Copy application code
 COPY . /code
