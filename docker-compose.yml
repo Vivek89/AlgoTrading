@@ -1,0 +1,60 @@
+services:
+  # 1. Main Backend API
+  api:
+    build: .
+    container_name: algo_api
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    env_file: .env
+    depends_on:
+      - db
+      - redis
+
+  # 2. Celery Worker
+  worker:
+    build: .
+    container_name: algo_worker
+    command: celery -A app.workers.celery_app worker --loglevel=info --concurrency=10
+    volumes:
+      - .:/code
+    env_file: .env
+    depends_on:
+      - db
+      - redis
+
+  # 3. Scheduler (Celery Beat)
+  beat:
+    build: .
+    container_name: algo_beat
+    command: celery -A app.workers.celery_app beat --loglevel=info
+    volumes:
+      - .:/code
+    env_file: .env
+    depends_on:
+      - redis
+
+  # 4. Database (PostgreSQL)
+  db:
+    image: postgres:15-alpine
+    container_name: algo_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=algo_trading
+    ports:
+      - "5432:5432"
+
+  # 5. Message Broker
+  redis:
+    image: redis:7-alpine
+    container_name: algo_redis
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:
