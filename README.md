@@ -398,3 +398,6 @@ For issues, questions, or contributions:
 **Version:** 0.1.0 (Alpha)  
 **Last Updated:** December 15, 2024
 " 
+
+
+kihbmcevp7@usa.edu.pl

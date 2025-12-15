@@ -11,7 +11,7 @@ function Dashboard({ user, onLogout }) {
   useEffect(() => {
     // Fetch initial data
     setLoading(false);
-  }, []);
+  }, []); 
 
   return (
     <div className="dashboard-container">
