@@ -1,131 +1,178 @@
-This is the consolidated **UX Implementation & Automated Test Plan**, refined to merge the "Speed & Scale" technology choices with the specific user journey requirements of your multi-tenant platform.
+This is the **Master UX Development Plan & Architecture**. It consolidates the "Speed & Scale" technology stack, persona-driven design, and a rigorous implementation roadmap for your multi-tenant fintech platform.
 
-### **Unified UX Implementation & Automated Test Plan**
-
-This document consolidates the high-performance constraints of the "Speed & Scale" tech stack with the detailed user-centric implementation strategies required for a modern, real-time fintech platform.
+This document focuses on **Frontend/UX Engineering**, while explicitly defining the **FastAPI Integration Contracts** required to power the UI.
 
 ---
 
-#### **Part 1: The "Speed & Scale" Tech Stack (2025)**
+# Part 1: The "Speed & Scale" Tech Stack (2025)
 
-This stack is selected to balance the need for extreme reactivity (handling high-frequency market ticks) with developer velocity and maintainability.
+We are deploying the "Golden Stack" for high-frequency trading interfaces.
 
-| Category | Technology | Rationale & Use Case |
+| Category | Technology | Rationale & UX Role |
 | :--- | :--- | :--- |
-| **Framework** | **Next.js 15 (App Router)** | Provides the server-side foundation for secure auth routes and optimized initial page loads (LCP). |
-| **UI System** | **shadcn/ui** | Built on **Radix UI** & **Tailwind CSS**. Offers accessible, "copy-paste" components that are easily customizable, avoiding the bloat of traditional component libraries. |
-| **State Management** | **Zustand** | Chosen for its **transient update** capability. Allows us to subscribe to state changes outside of React's render cycle, which is critical for high-frequency ticker updates. |
-| **Live Charts** | **Lightweight Charts (TradingView)** | **Critical Selection:** Uses HTML5 Canvas for rendering. Unlike SVG-based libraries (Recharts), this can handle 60fps market data streams without lagging the browser. |
-| **Static/P&L Charts** | **Recharts** | Used via `shadcn/charts` for smoother, more aesthetic visualizations like "Cumulative P&L" or "Backtest Results" where extreme update frequency isn't required. |
-| **Data Grid** | **TanStack Table (v8)** | Headless table library providing sorting, filtering, and pagination logic, wrapped in `shadcn` styling for the complex "Strategy Dashboard." |
-| **Forms** | **React Hook Form + Zod** | Ensures robust validation for complex financial inputs (e.g., preventing a Stop Loss > 100%) before data ever hits the API. |
-| **Socket Client** | **react-use-websocket** | Manages the WebSocket lifecycle, handling auto-reconnection, heartbeats, and connection status (Open/Closed/Error). |
-| **E2E Testing** | **Playwright** | Selected for its ability to **mock WebSocket frames** and support **multi-context testing** (simulating User A and User B trading simultaneously). |
+| **Framework** | **Next.js 15 (App Router)** | Server-Side Rendering (SSR) for secure, fast initial loads. Hosting the app shell. |
+| **UI System** | **shadcn/ui** | Built on **Radix UI** & **Tailwind**. Accessible, un-styled primitives that we customize for a "Bloomberg Terminal" aesthetic. |
+| **State (Global)** | **Zustand** | Used for **transient updates**. We subscribe to WebSocket streams and update chart components directly, bypassing React's main render cycle to maintain 60fps. |
+| **Data Fetching** | **TanStack Query (React Query)** | Manages server state (User Profile, Strategy List) with caching, polling, and optimistic updates. |
+| **Real-Time Charts** | **Lightweight Charts** | HTML5 Canvas rendering. Handles thousands of tick updates per second without browser lag. |
+| **Complex Forms** | **React Hook Form + Zod** | Manages the "Risk Management" and "Strategy Config" forms. Zod ensures no invalid money management rules are submitted. |
+| **Socket Client** | **react-use-websocket** | Robust WebSocket hook handling auto-reconnect, heartbeats, and connection status (Red/Yellow/Green UI indicators). |
+| **Testing** | **Playwright** | E2E testing capable of mocking WebSocket frames to simulate market crashes. |
 
 ---
 
-#### **Part 2: UX Implementation Strategy (Per Persona)**
+# Part 2: UX Implementation Strategy (Per Persona)
 
-**1. Priya (The "Set & Forget" Investor)**
-* **Goal:** Simplicity and Reassurance.
-* **Key Interface: The "Pulse" Dashboard**
-    * **Live Metrics:** Large, clear cards for "Today's P&L" and "Total Investment." Numbers use `react-countup` for smooth transitions.
-    * **Master Switch:** A prominent `Switch` component labeled "Global Strategy Status." Toggling this to "OFF" immediately triggers a backend "Panic" endpoint to cancel all orders.
-    * **Onboarding:** A step-by-step `Dialog` (Modal) for entering Zerodha credentials. Fields are masked (`type="password"`), and a "Lock" icon emphasizes encryption.
 
-**2. Raj (The Quant)**
-* **Goal:** Data Density and Precision.
-* **Key Interface: The Strategy Command Center**
-    * **Data Table:** A dense `TanStack Table` listing active strategies. Columns include *Symbol, Delta, Theta, Live P&L, Status*.
-    * **Real-Time Chart:** A `Lightweight Chart` (Candlestick) dominates the view, overlaying strategy entry/exit points on live market data.
-    * **Input Forms:** Complex forms using `Slider` (for percentages) and `Select` (for instrument types). Real-time validation shows potential "Max Loss" calculations as the user types.
 
-**3. Admin (The Superuser)**
-* **Goal:** System Observability.
-* **Key Interface: The "Tower" Dashboard**
-    * **Health Grid:** A traffic-light grid showing status of key services: "Zerodha API Gateway" (Green), "Celery Workers" (Green), "Market Data Feed" (Yellow).
-    * **Live Logs:** A virtualized list (using `react-window`) displaying the tail of system logs for monitoring errors during the morning login rush.
+### 1. Priya (The "Set & Forget" Investor)
+* **UX Goal:** "Confidence."
+* **Key Interface:** **The Pulse Dashboard**.
+* **Critical UI:**
+    * **Panic Switch:** A large toggle to "Exit All Positions."
+    * **Simple Cards:** "Total P&L" and "Capital Used" (No complex Greeks).
+    * **Wizard Modal:** A stepped dialog for securely entering Zerodha API credentials.
 
----
+### 2. Raj (The Quant)
+* **UX Goal:** "Control."
+* **Key Interface:** **The Strategy Command Center**.
+* **Critical UI:**
+    * **Dense Data Grid:** `TanStack Table` with sortable columns for Delta, Theta, and IV.
+    * **Live Chart:** Candlestick chart with overlay lines showing Entry Price and Stop Loss levels.
+    * **Complex Forms:** Sliders and Inputs for "Lock & Trail" logic.
 
-#### **Part 3: Automated Test Plan (The Pyramid)**
-
-**Level 1: Unit Testing (Vitest)**
-* *Focus:* Business Logic & Utilities.
-* **Tests:**
-    * `useSocketStore`: Verify that incoming JSON strings are correctly parsed and stored in the Zustand store.
-    * `calculatePnL(entry, current)`: robust math tests to ensure P&L calculations handle edge cases (e.g., zero price).
-    * `strategySchema`: Zod validation tests (e.g., ensuring `target_pct` is always positive).
-
-**Level 2: Integration Testing (React Testing Library)**
-* *Focus:* Component Interaction & Optimistic UI.
-* **Tests:**
-    * **Broker Connection:** Mock the API response. Verify that submitting the credentials form shows a "Encrypting..." loader, then a success `Toast`.
-    * **Advisor Approval:** Click "Approve" on a suggestion card. Verify the UI immediately marks it as "Applied" (Optimistic update) even before the API confirms.
-    * **Socket Reconnect:** Mock `useWebSocket`. Force a disconnect event and verify the "Connection Status" badge turns Red, then Yellow (Connecting).
-
-**Level 3: End-to-End (E2E) Testing (Playwright)**
-* *Focus:* Critical User Journeys (CUJs) & Real-Time simulation.
-* **Test Suite A: The "Morning Rush"**
-    * *Scenario:* Spawn 5 concurrent browser contexts (Users).
-    * *Action:* Attempt simultaneous login and token generation.
-    * *Check:* All 5 users receive a "Token Generated" success message within 5 seconds.
-* **Test Suite B: The "Market Volatility" Stress Test**
-    * *Scenario:* Open the Dashboard.
-    * *Mock:* Intercept the WebSocket URL and inject a burst of 50 ticks in 1 second.
-    * *Check:*
-        1.  **Visual:** Snapshot test to confirm the Chart rendered the spikes.
-        2.  **Performance:** Ensure the UI did not freeze (frame rate check).
-        3.  **Data:** Verify "Total P&L" text matches the final tick value.
+### 3. Admin (The Superuser)
+* **UX Goal:** "Observability."
+* **Key Interface:** **The Tower Dashboard**.
+* **Critical UI:**
+    * **Health Grid:** Traffic-light status for Broker APIs and Celery Workers.
+    * **Live Logs:** Virtualized scrolling list of system events.
 
 ---
 
-#### **Part 4: Development Roadmap (Sprint Breakdown)**
+# Part 3: Detailed UI Pages & FastAPI Integration
 
-**Sprint 1: The Secure Foundation (Weeks 1-2)**
-* **Goal:** Secure Auth & Credential Storage.
+### Page 1: Authentication & Broker Setup (`/auth`, `/settings`)
+**UX Description:** A clean, trust-inspiring login page followed by a secure credentials management form. The form fields for API Secret/TOTP must be masked and clearly labeled as "End-to-End Encrypted."
+
+**Backend Integration (FastAPI):**
+| UI Action | HTTP Method | Endpoint | Payload / Params |
+| :--- | :--- | :--- | :--- |
+| **Login with Google** | `GET` | `/auth/login/google` | `?redirect_uri=...` |
+| **Save Credentials** | `POST` | `/broker/credentials` | `{ "api_key": "...", "api_secret": "...", "totp_key": "..." }` |
+| **Check Connection** | `POST` | `/broker/test-connection` | *(Empty, uses session cookie)* |
+
+### Page 2: Strategy Configuration Wizard (`/strategies/new`)
+**UX Description:** A multi-step form using **React Hook Form**.
+1.  **Selection:** Card grid to select "Straddle", "Strangle", or "Iron Fly".
+2.  **Parameters:** Dynamic fields based on selection (e.g., Strike Distance).
+3.  **Risk Management:** An accordion section for "Lock & Trail" (See Sprint 6).
+
+**Backend Integration (FastAPI):**
+| UI Action | HTTP Method | Endpoint | Payload / Params |
+| :--- | :--- | :--- | :--- |
+| **Save Draft** | `POST` | `/strategies` | `{ "type": "STRADDLE", "config": {...}, "risk_config": {...} }` |
+| **Validate Config** | `POST` | `/strategies/validate` | `{ "config": ... }` *(Returns math errors like "SL > Capital")* |
+
+### Page 3: The Command Center (Dashboard) (`/dashboard`)
+**UX Description:** The high-performance view.
+* **Top Bar:** Global P&L (Green/Red), Connection Status Dot.
+* **Main Stage:** **Lightweight Chart** (Canvas) showing the active symbol.
+* **Bottom Panel:** **TanStack Table** of active strategies. Rows flash yellow on update.
+
+**Backend Integration (FastAPI):**
+| UI Action | Protocol | Endpoint | Data Flow |
+| :--- | :--- | :--- | :--- |
+| **Live Market Data** | `WebSocket` | `ws://api.../ws/ticks` | Server pushes `{"symbol": "NIFTY", "ltp": 24500}` |
+| **Order Updates** | `WebSocket` | `ws://api.../ws/orders` | Server pushes `{"order_id": "123", "status": "COMPLETE"}` |
+| **Panic Exit** | `POST` | `/emergency/kill-switch` | `{ "user_id": "..." }` |
+
+### Page 4: Social Marketplace (`/marketplace`)
+**UX Description:** A grid of cards displaying shared strategies. Each card shows "ROI", "Max Drawdown", and a "Clone" button.
+
+**Backend Integration (FastAPI):**
+| UI Action | HTTP Method | Endpoint | Payload / Params |
+| :--- | :--- | :--- | :--- |
+| **Fetch Shared** | `GET` | `/strategies/shared` | `?sort=downloads` |
+| **Clone Strategy** | `POST` | `/strategies/{id}/clone` | *(Creates copy in user's DB)* |
+
+---
+
+# Part 4: Automated Test Plan (The Pyramid)
+
+
+
+[Image of software testing pyramid]
+
+
+1.  **Level 1: Unit Testing (Vitest)**
+    * **Zod Schemas:** Verify that `riskSchema` correctly rejects a "Target Profit" of -500.
+    * **Math Utils:** Test `calculateTrailingSL(entry, current, config)` for exactness.
+2.  **Level 2: Integration Testing (React Testing Library)**
+    * **Forms:** Fill out the Strategy Form, mock the API success, assert the "Success Toast" appears.
+    * **Socket Reconnect:** Mock the WebSocket closing, assert the UI Badge turns "Yellow/Reconnecting".
+3.  **Level 3: E2E Testing (Playwright)**
+    * **Multi-User Sim:** Open 3 browser contexts. Log in as 3 different users. Assert all 3 can generate tokens simultaneously.
+    * **Market Crash:** Inject a mock WebSocket message dropping the price by 5%. Assert the "Stop Loss Triggered" UI state appears.
+
+---
+
+# Part 5: Development Roadmap (Sprints)
+
+### Sprint 1: Core Foundation & Auth (Weeks 1-2)
+* **Goal:** Secure Login & Credential Vault.
 * **Tasks:**
-    * Initialize Next.js 15 repo with TypeScript, Tailwind, shadcn/ui.
-    * Implement Google OAuth (`NextAuth.js`) and secure session cookie handling.
+    * Initialize Next.js 15, Tailwind, shadcn/ui.
+    * Implement **Google OAuth** logic (`NextAuth.js`).
     * Build `BrokerCredentialsForm`:
-        * UI: Inputs for API Key, Secret, TOTP.
-        * Logic: Encrypt fields payload before POST to backend.
-* **Deliverable:** Functional Login and "Settings" page.
+        * Implement **Fernet encryption** utility (Frontend encrypts payload before sending).
+        * Create API Client wrapper (Axios/Fetch) with Interceptors for 401 handling.
+* **Deliverable:** Functional Login and Settings Page.
 
-**Sprint 2: Strategy Configuration Engine (Weeks 3-4)**
-* **Goal:** Strategy CRUD.
+### Sprint 2: Strategy Engine & Risk Engine Logic (Weeks 3-5) [HEAVY LIFT]
+* **Goal:** The Strategy "Wizard" UI.
 * **Tasks:**
-    * Create `StrategyForm` schema with Zod validation (Straddle vs. Iron Condor logic).
-    * Implement `StrategiesTable`:
-        * Fetch data via React Query (SWR).
-        * Add "Edit" and "Delete" actions.
-* **Deliverable:** Users can create, view, and save strategies.
+    * Create `StrategyForm` with **React Hook Form**.
+    * Implement **Zod Schemas** for:
+        * `StraddleConfig` (ATM/OTM selection).
+        * `IronCondorConfig` (Wing width).
+    * Build the `StrategyTable` using **TanStack Table** (Columns: Name, Instrument, Status, Actions).
+    * **Integration:** Connect to `POST /strategies` and `GET /strategies`.
+* **Deliverable:** Users can Create, Read, Update, and Delete (CRUD) strategies.
 
-**Sprint 3: The Real-Time Engine (Weeks 5-6) [CRITICAL]**
-* **Goal:** Live Charts & WebSocket Integration.
+### Sprint 3: Real-Time Execution, Charts & WebSocket (Weeks 6-7)
+* **Goal:** The "Alive" Dashboard.
 * **Tasks:**
-    * Integrate `react-use-websocket` to connect to FastAPI `ws://.../ticks`.
-    * Build `LiveMarketChart` component using **Lightweight Charts**.
-    * Implement `StreamingPnLCard` using **Zustand** for direct DOM updates (bypassing React render for performance).
-    * Add "Connection Health" status indicators.
-* **Deliverable:** Dashboard with live-updating charts and P&L.
+    * Setup **Zustand Store** for `marketData` and `orderLog`.
+    * Integrate `react-use-websocket` to listen to `/ws/ticks`.
+    * Build `LiveMarketChart` component wrapper around **Lightweight Charts**.
+    * Implement **Transient Updates**: Ensure Chart updates do not re-render the Sidebar or Header.
+    * Add **Connection Health** indicator (Green/Red dot).
+* **Deliverable:** Dashboard with live-ticking charts and P&L.
 
-**Sprint 4: The Advisor & Backtesting (Weeks 7-8)**
-* **Goal:** Intelligence & Simulation.
+### Sprint 4: Social Sharing & Marketplace (Weeks 8-9)
+* **Goal:** Community & Sharing.
 * **Tasks:**
-    * Build `AdvisorNotificationCenter`: Real-time alerts for strategy optimization.
-    * Create `BacktestPlayground`:
-        * Date Range Picker.
-        * Static `Recharts` Area chart for historical P&L visualization.
-* **Deliverable:** Functional "Advisor" tab and Backtesting UI.
+    * Build the **Share Modal**: Generates a unique link `platform.com/share/xyz`.
+    * Build `MarketplaceGrid`: Display shared strategies with "Clone" buttons.
+    * **Integration:** `POST /strategies/{id}/clone`.
+* **Deliverable:** A public gallery of strategies and cloning functionality.
 
-**Sprint 5: Admin, Polish & Load Testing (Weeks 9-10)**
+### Sprint 5: Admin, Polish & Stress Testing (Weeks 10-11)
 * **Goal:** Production Hardening.
 * **Tasks:**
-    * Build `AdminHealthDashboard` (Service status monitoring).
-    * **Load Testing:** Use Playwright to simulate 50+ concurrent socket connections.
-    * **Resilience:** Test UI behavior during network interruptions (auto-reconnect).
-* **Deliverable:** Production-ready release candidate.
+    * Build `AdminHealthDashboard`: Visualize Celery Worker queues and API Latency.
+    * **Playwright Load Test:** Simulate 50 concurrent browser sessions receiving high-frequency socket ticks.
+    * **UX Polish:** Add Skeleton loaders, Tooltips, and Error Boundaries.
+* **Deliverable:** Production Release Candidate.
 
-### **Next Step**
-I can generate the **React code for the `LiveMarketChart` component** (Sprint 3), specifically demonstrating how to integrate `Lightweight Charts` with `react-use-websocket` and `Zustand` to achieve high-performance updates without re-renders. Would you like to proceed with that?
+### Sprint 6: Functional Specification: Advanced Risk Management Engine (The "Guardrails")
+* **Goal:** Visualizing "Lock & Trail" Logic.
+* **Tasks:**
+    * **Enhance Strategy Form:** Add the "Risk Management" accordion.
+    * **UI Components:**
+        * `RadioGroup` for "None / Lock / Trail / Lock & Trail".
+        * `Collapsible` section for the 4-step parameter inputs (Reach, Lock, Step, Trail).
+    * **Visualizer:** Create a small static SVG diagram in the form that *changes dynamically* as the user types, visually explaining how their Lock & Trail logic will behave.
+    * **Backend Integration:** Map these form fields to the `risk_management` JSON key in the `POST /strategies` payload.
+* **Deliverable:** The advanced "Guardrails" UI fully implemented and validated.
