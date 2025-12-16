@@ -23,7 +23,7 @@ from app.api.schemas import (
 
 # Set up logging
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 
@@ -42,6 +42,31 @@ def decode_id_token(id_token: str) -> dict:
     except Exception as e:
         logger.error(f"Failed to decode ID token: {str(e)}", exc_info=True)
         raise ValueError(f"Invalid ID token: {str(e)}")
+
+
+@router.get("/google")
+async def google_auth():
+    """
+    Initiate Google OAuth flow - redirects to Google's authorization endpoint
+    """
+    logger.info("Google OAuth flow initiated")
+    
+    # Build Google's authorization URL
+    auth_url = "https://accounts.google.com/o/oauth2/v2/auth"
+    params = {
+        "client_id": settings.GOOGLE_CLIENT_ID,
+        "redirect_uri": settings.GOOGLE_REDIRECT_URI,
+        "response_type": "code",
+        "scope": "openid profile email",
+        "access_type": "offline",
+        "prompt": "consent",
+    }
+    
+    # Build query string
+    query_string = "&".join([f"{k}={v}" for k, v in params.items()])
+    redirect_url = f"{auth_url}?{query_string}"
+    
+    return RedirectResponse(url=redirect_url, status_code=302)
 
 
 @router.get("/google/callback")
@@ -138,9 +163,9 @@ async def google_callback_get(code: str = Query(...), db: Session = Depends(get_
         refresh_token = JWTManager.create_refresh_token(str(user.id))
         logger.debug(f"Tokens created - Access token length: {len(access_token)}, Refresh token length: {len(refresh_token)}")
         
-        # Redirect to dashboard with token in query
-        redirect_url = f"http://localhost:3000/dashboard?token={access_token}&refresh_token={refresh_token}"
-        logger.info(f"Redirecting to dashboard")
+        # Redirect to login page with token in query
+        redirect_url = f"http://localhost:3000/login?token={access_token}&refresh_token={refresh_token}"
+        logger.info(f"Redirecting to login page with authentication tokens")
         logger.debug(f"Redirect URL: {redirect_url[:100]}...")
         
         response = RedirectResponse(url=redirect_url, status_code=302)

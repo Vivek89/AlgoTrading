@@ -128,3 +128,85 @@ async def get_strategy(
         is_active=strategy.is_active,
         created_at=strategy.created_at.isoformat()
     )
+
+
+@router.put("/{strategy_id}", response_model=StrategyResponse)
+async def update_strategy(
+    strategy_id: str,
+    strategy_update: StrategyCreate,
+    authorization: str = Header(None),
+    db: Session = Depends(get_db)
+):
+    """Update an existing strategy"""
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing or invalid authorization header"
+        )
+    
+    token = authorization.split(" ")[1]
+    payload = JWTManager.verify_token(token)
+    
+    if not payload:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+    
+    user_id = payload.get("sub")
+    strategy = db.query(Strategy).filter(
+        Strategy.id == strategy_id,
+        Strategy.user_id == user_id
+    ).first()
+    
+    if not strategy:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Strategy not found")
+    
+    # Update fields
+    strategy.name = strategy_update.name
+    strategy.strategy_type = strategy_update.strategy_type
+    strategy.config = strategy_update.config
+    strategy.updated_at = datetime.utcnow()
+    
+    db.commit()
+    db.refresh(strategy)
+    
+    return StrategyResponse(
+        id=strategy.id,
+        name=strategy.name,
+        strategy_type=strategy.strategy_type,
+        config=strategy.config,
+        is_active=strategy.is_active,
+        created_at=strategy.created_at.isoformat()
+    )
+
+
+@router.delete("/{strategy_id}")
+async def delete_strategy(
+    strategy_id: str,
+    authorization: str = Header(None),
+    db: Session = Depends(get_db)
+):
+    """Delete a strategy"""
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing or invalid authorization header"
+        )
+    
+    token = authorization.split(" ")[1]
+    payload = JWTManager.verify_token(token)
+    
+    if not payload:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+    
+    user_id = payload.get("sub")
+    strategy = db.query(Strategy).filter(
+        Strategy.id == strategy_id,
+        Strategy.user_id == user_id
+    ).first()
+    
+    if not strategy:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Strategy not found")
+    
+    db.delete(strategy)
+    db.commit()
+    
+    return {"message": "Strategy deleted successfully"}
