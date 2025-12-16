@@ -14,8 +14,8 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_SECRET: str = "your-google-client-secret"
     GOOGLE_REDIRECT_URI: str = "http://localhost:8000/api/v1/auth/google/callback"
     
-    # Encryption
-    ENCRYPTION_KEY: str = "your-encryption-key-min-32-chars-long!!!!!"  # Min 32 chars
+    # Encryption (must be a valid 44-character Fernet key)
+    ENCRYPTION_KEY: str = "aRZTMjLqIhFYN1Q3mKAd3qnj-KH-Su0kOJUlEN9jmWY="  # Default Fernet key
     
     # JWT
     SECRET_KEY: str = "your-jwt-secret-key-min-32-chars-long!!!"

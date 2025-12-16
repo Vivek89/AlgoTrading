@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { strategySchema, type StrategyFormData } from '@/lib/validations/strategy'
 import { useState } from 'react'
+import RiskManagementAccordion from '@/components/RiskManagementAccordion'
 
 interface StrategyFormProps {
   onSubmit: (data: StrategyFormData) => Promise<void>
@@ -19,10 +20,15 @@ export default function StrategyForm({ onSubmit, initialData, isLoading }: Strat
     handleSubmit,
     watch,
     setValue,
+    control,
     formState: { errors },
   } = useForm<StrategyFormData>({
     resolver: zodResolver(strategySchema),
-    defaultValues: initialData,
+    defaultValues: initialData || {
+      riskManagement: {
+        mode: 'NONE',
+      },
+    },
   })
 
   const strategyType = watch('strategyType')
@@ -291,6 +297,13 @@ export default function StrategyForm({ onSubmit, initialData, isLoading }: Strat
               )}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Risk Management Section */}
+      {selectedType && (
+        <div className="pt-4">
+          <RiskManagementAccordion control={control} watch={watch} errors={errors} />
         </div>
       )}
 

@@ -6,6 +6,7 @@ from sqlalchemy.orm import relationship
 from datetime import datetime
 import uuid
 from app.core.database import Base
+from app.models.shared_strategy import SharedStrategy
 
 
 class User(Base):
@@ -17,6 +18,7 @@ class User(Base):
     email = Column(String(255), unique=True, nullable=False, index=True)
     full_name = Column(String(255))
     profile_picture_url = Column(Text)
+    theme_preference = Column(String(10), default='dark')  # 'light' or 'dark'
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
     is_active = Column(Boolean, default=True)
@@ -56,6 +58,7 @@ class Strategy(Base):
     name = Column(String(255), nullable=False)
     strategy_type = Column(String(100), nullable=False)  # e.g., "SHORT_STRADDLE", "IRON_CONDOR"
     config = Column(JSON, default={})  # Flexible configuration (SMA periods, stop loss, etc.)
+    risk_management = Column(JSON, default=None)  # Risk management configuration (Lock & Trail logic)
     is_active = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
     updated_at = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)

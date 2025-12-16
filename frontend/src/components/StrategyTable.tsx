@@ -25,6 +25,7 @@ interface StrategyTableProps {
   onEdit: (strategy: Strategy) => void
   onDelete: (id: string) => void
   onToggleActive: (id: string, isActive: boolean) => void
+  onShare?: (strategy: Strategy) => void
   isLoading?: boolean
 }
 
@@ -33,6 +34,7 @@ export default function StrategyTable({
   onEdit,
   onDelete,
   onToggleActive,
+  onShare,
   isLoading,
 }: StrategyTableProps) {
   const [sorting, setSorting] = useState<SortingState>([])
@@ -117,6 +119,15 @@ export default function StrategyTable({
             >
               Edit
             </button>
+            {onShare && (
+              <button
+                onClick={() => onShare(strategy)}
+                className="px-3 py-1 text-sm text-green-600 hover:bg-green-50 rounded transition-colors"
+                title="Share to marketplace"
+              >
+                Share
+              </button>
+            )}
             <button
               onClick={() => {
                 if (confirm('Are you sure you want to delete this strategy?')) {

@@ -9,7 +9,7 @@ import pyotp
 from app.core.config import settings
 
 # Initialize Fernet cipher
-cipher = Fernet(settings.ENCRYPTION_KEY.encode().ljust(44, b'=')[:44])
+cipher = Fernet(settings.ENCRYPTION_KEY.encode())
 
 
 class EncryptionManager:

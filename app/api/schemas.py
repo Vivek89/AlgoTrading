@@ -33,6 +33,7 @@ class StrategyCreate(BaseModel):
     name: str
     strategy_type: str
     config: dict = {}
+    risk_management: Optional[dict] = None
 
 
 class StrategyResponse(BaseModel):
@@ -41,6 +42,7 @@ class StrategyResponse(BaseModel):
     name: str
     strategy_type: str
     config: dict
+    risk_management: Optional[dict] = None
     is_active: bool
     created_at: str
 

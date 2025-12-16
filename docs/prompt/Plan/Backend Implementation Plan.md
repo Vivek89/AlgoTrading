@@ -4,7 +4,7 @@ This is a comprehensive **Backend Implementation Plan** designed to mirror your 
 
   * **Framework:** `FastAPI` (High performance, native async).
   * **Database ORM:** `SQLAlchemy 2.0` (Async support) + `Alembic` (Migrations).
-  * **Database:** `PostgreSQL` (User/Strategy data) + `TimescaleDB` (Tick history).
+  * **Database:** `PostgreSQL` (User/Strategy data) for Prod or SQLlight for Local/Dev Testing + `TimescaleDB` (Tick history).
   * **Broker Integration:** `kiteconnect` (Zerodha official lib) wrapped in a custom Adapter Pattern.
   * **Task Queue:** `Celery` + `Redis` (Broker/Backend).
   * **Real-Time State:** `Redis` (Pub/Sub for Ticks, caching P\&L state).

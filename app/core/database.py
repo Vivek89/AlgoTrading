@@ -18,7 +18,7 @@ Base = declarative_base()
 def init_db():
     """Initialize database tables"""
     # Import models to register them with Base
-    from app.models import User, BrokerCredential, Strategy, TradeLog, AdvisorSuggestion
+    from app.models import User, BrokerCredential, Strategy, TradeLog, AdvisorSuggestion, SharedStrategy
     
     # Create all tables
     Base.metadata.create_all(bind=engine)

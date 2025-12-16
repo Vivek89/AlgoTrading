@@ -43,6 +43,7 @@ async def create_strategy(
         name=strategy.name,
         strategy_type=strategy.strategy_type,
         config=strategy.config,
+        risk_management=strategy.risk_management,
     )
     db.add(new_strategy)
     db.commit()
@@ -53,6 +54,7 @@ async def create_strategy(
         name=new_strategy.name,
         strategy_type=new_strategy.strategy_type,
         config=new_strategy.config,
+        risk_management=new_strategy.risk_management,
         is_active=new_strategy.is_active,
         created_at=new_strategy.created_at.isoformat()
     )
@@ -85,6 +87,7 @@ async def list_strategies(
             name=s.name,
             strategy_type=s.strategy_type,
             config=s.config,
+            risk_management=s.risk_management,
             is_active=s.is_active,
             created_at=s.created_at.isoformat()
         )
@@ -125,6 +128,7 @@ async def get_strategy(
         name=strategy.name,
         strategy_type=strategy.strategy_type,
         config=strategy.config,
+        risk_management=strategy.risk_management,
         is_active=strategy.is_active,
         created_at=strategy.created_at.isoformat()
     )
@@ -163,6 +167,7 @@ async def update_strategy(
     strategy.name = strategy_update.name
     strategy.strategy_type = strategy_update.strategy_type
     strategy.config = strategy_update.config
+    strategy.risk_management = strategy_update.risk_management
     strategy.updated_at = datetime.utcnow()
     
     db.commit()
@@ -173,6 +178,7 @@ async def update_strategy(
         name=strategy.name,
         strategy_type=strategy.strategy_type,
         config=strategy.config,
+        risk_management=strategy.risk_management,
         is_active=strategy.is_active,
         created_at=strategy.created_at.isoformat()
     )

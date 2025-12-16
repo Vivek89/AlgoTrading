@@ -4,6 +4,7 @@ import { getSession } from '@/auth'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import BrokerCredentialsForm from '@/components/BrokerCredentialsForm'
+import DashboardLayout from '@/components/DashboardLayout'
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -43,30 +44,17 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-              <p className="text-gray-600">Manage your broker credentials</p>
-            </div>
-            <a
-              href="/dashboard"
-              className="px-4 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 transition-colors"
-            >
-              ← Back to Dashboard
-            </a>
-          </div>
-        </div>
-      </header>
+    <DashboardLayout session={session} currentPage="settings">
+      {/* Page Title */}
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-white mb-2">Broker Setup</h2>
+        <p className="text-gray-400">Manage your broker API credentials securely</p>
+      </div>
 
-      {/* Main Content */}
-      <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="card">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Broker Credentials</h2>
-          <p className="text-gray-600 mb-6">
+      <div className="max-w-2xl">
+        <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-white/10">
+          <h2 className="text-2xl font-bold text-white mb-2">Broker Setup</h2>
+          <p className="text-gray-300 mb-6">
             Add or update your trading broker API credentials. All information is encrypted before
             transmission and stored securely on the server.
           </p>
@@ -82,9 +70,9 @@ export default function SettingsPage() {
 
         {/* Security Info */}
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="card">
-            <h3 className="font-bold text-gray-900 mb-4">🔐 End-to-End Encryption</h3>
-            <ul className="space-y-2 text-sm text-gray-600">
+          <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
+            <h3 className="font-bold text-white mb-4">🔐 End-to-End Encryption</h3>
+            <ul className="space-y-2 text-sm text-gray-300">
               <li>✓ Credentials encrypted on your device</li>
               <li>✓ Transmitted over HTTPS only</li>
               <li>✓ Decrypted only when needed by backend</li>
@@ -92,9 +80,9 @@ export default function SettingsPage() {
             </ul>
           </div>
 
-          <div className="card">
-            <h3 className="font-bold text-gray-900 mb-4">🛡️ Access Control</h3>
-            <ul className="space-y-2 text-sm text-gray-600">
+          <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
+            <h3 className="font-bold text-white mb-4">🛡️ Access Control</h3>
+            <ul className="space-y-2 text-sm text-gray-300">
               <li>✓ JWT token validation</li>
               <li>✓ Session-based access</li>
               <li>✓ Automatic token expiration</li>
@@ -104,20 +92,20 @@ export default function SettingsPage() {
         </div>
 
         {/* Terms */}
-        <div className="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-lg">
-          <h3 className="font-bold text-blue-900 mb-2">Terms & Conditions</h3>
-          <p className="text-blue-800 text-sm">
+        <div className="mt-8 p-6 bg-blue-500/20 border border-blue-500/30 rounded-xl backdrop-blur-sm">
+          <h3 className="font-bold text-blue-200 mb-2">Terms & Conditions</h3>
+          <p className="text-blue-300 text-sm">
             By submitting your broker credentials, you acknowledge that:
           </p>
-          <ul className="text-blue-800 text-sm space-y-1 mt-2 ml-4">
+          <ul className="text-blue-300 text-sm space-y-1 mt-2 ml-4">
             <li>• You are the rightful owner of these credentials</li>
             <li>• You understand the risks of sharing API credentials</li>
-            <li>• AlgoTrading will not be responsible for unauthorized trades</li>
+            <li>• QuantPro will not be responsible for unauthorized trades</li>
             <li>• You should enable IP whitelisting on your broker account</li>
             <li>• You should regularly rotate your API secret</li>
           </ul>
         </div>
-      </main>
-    </div>
+      </div>
+    </DashboardLayout>
   )
 }

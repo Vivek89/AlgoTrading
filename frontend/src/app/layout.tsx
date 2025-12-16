@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { Providers } from '@/components/Providers'
 
 export const metadata: Metadata = {
-  title: 'AlgoTrading - Secure Trading Strategies',
-  description: 'Secure algorithmic trading with multi-layer authentication',
+  title: 'QuantPro - Algorithmic Trading Platform',
+  description: 'Advanced algorithmic trading strategies with real-time market data',
 }
 
 export default function RootLayout({
@@ -12,9 +13,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
-        {children}
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   )
