@@ -21,23 +21,119 @@ body {
 }
 
 @layer components {
+  /* ===== BUTTONS ===== */
   .btn {
     @apply px-4 py-2 rounded-lg font-medium transition-colors duration-200;
   }
 
   .btn-primary {
-    @apply btn bg-blue-600 text-white hover:bg-blue-700;
+    @apply btn bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700;
   }
 
   .btn-secondary {
-    @apply btn bg-gray-200 text-gray-900 hover:bg-gray-300;
+    @apply btn bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600;
   }
 
+  .btn-ghost {
+    @apply btn bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 dark:bg-white/10 dark:hover:bg-white/20 dark:text-white dark:border-white/20;
+  }
+
+  /* ===== INPUTS ===== */
   .input {
-    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-white/5 dark:border-white/10 dark:text-white;
   }
 
+  /* ===== CARDS ===== */
   .card {
-    @apply bg-white rounded-lg shadow-md p-6;
+    @apply backdrop-blur-xl rounded-2xl p-6 border transition-colors bg-white border-gray-200 dark:bg-white/5 dark:border-white/10;
+  }
+
+  .card-hover {
+    @apply card hover:border-purple-500 dark:hover:border-purple-500 cursor-pointer;
+  }
+
+  .card-gradient {
+    @apply backdrop-blur-xl rounded-2xl p-6 border transition-colors;
+  }
+
+  /* ===== BACKGROUNDS ===== */
+  .bg-app {
+    @apply min-h-screen transition-colors duration-300 bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-[#1a0b2e] dark:via-[#2d1b4e] dark:to-[#1a0b2e];
+  }
+
+  .bg-header {
+    @apply bg-white/90 backdrop-blur-xl border-b border-gray-200 shadow-sm dark:bg-black/20 dark:border-white/10 dark:shadow-none;
+  }
+
+  /* ===== TEXT GRADIENTS ===== */
+  .text-brand-gradient {
+    @apply bg-gradient-to-r from-purple-600 via-pink-500 to-purple-600 bg-clip-text text-transparent dark:from-purple-400 dark:via-pink-400 dark:to-purple-400;
+  }
+
+  /* ===== AVATAR ===== */
+  .avatar-gradient {
+    @apply rounded-full w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm;
+  }
+
+  /* ===== NAVIGATION ===== */
+  .nav-item {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5;
+  }
+
+  .nav-item-active {
+    @apply nav-item font-medium backdrop-blur-sm border bg-gradient-to-r from-blue-50 to-purple-50 border-blue-300 text-blue-700 dark:from-purple-500/20 dark:to-pink-500/20 dark:border-purple-500/30 dark:text-white;
+  }
+
+  /* ===== BADGES ===== */
+  .badge {
+    @apply px-2 py-1 rounded-full text-xs font-medium;
+  }
+
+  .badge-success {
+    @apply badge bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400;
+  }
+
+  .badge-error {
+    @apply badge bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400;
+  }
+
+  .badge-warning {
+    @apply badge bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400;
+  }
+
+  .badge-info {
+    @apply badge bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400;
+  }
+
+  /* ===== PROGRESS BARS ===== */
+  .progress-bar-bg {
+    @apply w-full bg-gray-200 dark:bg-white/10 rounded-full h-1.5;
+  }
+
+  .progress-bar-success {
+    @apply bg-gradient-to-r from-green-500 to-emerald-500 h-1.5 rounded-full;
+  }
+
+  .progress-bar-error {
+    @apply bg-gradient-to-r from-red-500 to-orange-500 h-1.5 rounded-full;
+  }
+
+  /* ===== MODALS ===== */
+  .modal-overlay {
+    @apply fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4;
+  }
+
+  .modal-content {
+    @apply bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-auto border dark:border-white/10;
+  }
+
+  /* ===== LOADING ===== */
+  .spinner {
+    @apply animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 dark:border-purple-400;
+  }
+
+  /* ===== ICON BADGES ===== */
+  .icon-badge {
+    @apply w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold;
   }
 }

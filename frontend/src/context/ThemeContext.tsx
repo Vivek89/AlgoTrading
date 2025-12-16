@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import { THEMES, STORAGE_KEYS, API_ENDPOINTS } from '@/lib/constants'
 
 type Theme = 'light' | 'dark'
 
@@ -11,34 +12,36 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('dark')
+  const [theme, setTheme] = useState<Theme>(THEMES.DARK)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
     // Load theme from localStorage
-    const savedTheme = localStorage.getItem('theme') as Theme | null
+    const savedTheme = localStorage.getItem(STORAGE_KEYS.THEME) as Theme | null
     if (savedTheme) {
       setTheme(savedTheme)
-      if (savedTheme === 'dark') {
+      if (savedTheme === THEMES.DARK) {
         document.documentElement.classList.add('dark')
       } else {
         document.documentElement.classList.remove('dark')
       }
     } else {
       // Default to dark theme
-      setTheme('dark')
+      setTheme(THEMES.DARK)
       document.documentElement.classList.add('dark')
     }
   }, [])
 
   const toggleTheme = async () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark'
+    const newTheme = theme === THEMES.DARK ? THEMES.LIGHT : THEMES.DARK
     setTheme(newTheme)
-    localStorage.setItem('theme', newTheme)
+    localStorage.setItem(STORAGE_KEYS.THEME, newTheme)
     
-    if (newTheme === 'dark') {
+    if (newTheme === THEMES.DARK) {
       document.documentElement.classList.add('dark')
     } else {
       document.documentElement.classList.remove('dark')
@@ -46,9 +49,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
     // Persist to backend
     try {
-      const token = localStorage.getItem('accessToken')
+      const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)
       if (token) {
-        await fetch('http://localhost:8000/api/v1/users/me/theme', {
+        await fetch(`${API_URL}${API_ENDPOINTS.USERS.THEME}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
