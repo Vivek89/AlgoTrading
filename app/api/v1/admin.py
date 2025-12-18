@@ -9,7 +9,7 @@ from app.core.security import JWTManager
 from app.models import User
 from pydantic import BaseModel
 from typing import Dict, List
-from datetime import datetime
+from datetime import datetime, timezone
 import time
 
 router = APIRouter(prefix="/api/v1/admin", tags=["admin"])
@@ -53,7 +53,7 @@ async def check_database_health(db: Session) -> HealthMetric:
             status=status_val,
             latency_ms=latency,
             message=message,
-            timestamp=datetime.utcnow().isoformat()
+            timestamp=datetime.now(timezone.utc).isoformat()
         )
     except Exception as e:
         return HealthMetric(
@@ -61,7 +61,7 @@ async def check_database_health(db: Session) -> HealthMetric:
             status="unhealthy",
             latency_ms=None,
             message=f"Database connection failed: {str(e)}",
-            timestamp=datetime.utcnow().isoformat()
+            timestamp=datetime.now(timezone.utc).isoformat()
         )
 
 
@@ -75,7 +75,7 @@ async def check_websocket_health() -> HealthMetric:
             status="healthy",
             latency_ms=0,
             message="WebSocket endpoint available",
-            timestamp=datetime.utcnow().isoformat()
+            timestamp=datetime.now(timezone.utc).isoformat()
         )
     except Exception as e:
         return HealthMetric(
@@ -83,7 +83,7 @@ async def check_websocket_health() -> HealthMetric:
             status="unhealthy",
             latency_ms=None,
             message=f"WebSocket service error: {str(e)}",
-            timestamp=datetime.utcnow().isoformat()
+            timestamp=datetime.now(timezone.utc).isoformat()
         )
 
 
@@ -92,7 +92,7 @@ async def check_api_latency() -> HealthMetric:
     try:
         start = time.time()
         # Simulate a simple operation
-        _ = datetime.utcnow()
+        _ = datetime.now(timezone.utc)
         latency = (time.time() - start) * 1000
         
         return HealthMetric(
@@ -100,7 +100,7 @@ async def check_api_latency() -> HealthMetric:
             status="healthy" if latency < 100 else "degraded",
             latency_ms=latency,
             message=f"Average response time: {latency:.2f}ms",
-            timestamp=datetime.utcnow().isoformat()
+            timestamp=datetime.now(timezone.utc).isoformat()
         )
     except Exception as e:
         return HealthMetric(
@@ -108,7 +108,7 @@ async def check_api_latency() -> HealthMetric:
             status="unhealthy",
             latency_ms=None,
             message=f"API latency check failed: {str(e)}",
-            timestamp=datetime.utcnow().isoformat()
+            timestamp=datetime.now(timezone.utc).isoformat()
         )
 
 
@@ -164,7 +164,7 @@ async def get_system_health(
     return SystemHealthResponse(
         overall_status=overall_status,
         checks=checks,
-        timestamp=datetime.utcnow().isoformat()
+        timestamp=datetime.now(timezone.utc).isoformat()
     )
 
 
@@ -203,5 +203,5 @@ async def get_system_stats(
         "total_strategies": total_strategies,
         "active_strategies": active_strategies,
         "shared_strategies": shared_strategies,
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }

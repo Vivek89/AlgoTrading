@@ -37,7 +37,9 @@ export default function StrategiesPage() {
         return
       }
       setSession(sess)
-      await fetchStrategies(sess.accessToken)
+      if (sess.accessToken) {
+        await fetchStrategies(sess.accessToken)
+      }
     }
     checkAuth()
   }, [router])
@@ -248,7 +250,7 @@ export default function StrategiesPage() {
 
         {/* Action Bar */}
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-bold text-white">My Strategies</h2>
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">My Strategies</h2>
           <button
             onClick={() => {
               setShowForm(!showForm)

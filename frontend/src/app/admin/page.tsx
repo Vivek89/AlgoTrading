@@ -58,14 +58,16 @@ export default function AdminPage() {
     const accessToken = token || session?.accessToken;
     if (!accessToken) return;
 
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
     try {
       const [healthRes, statsRes] = await Promise.all([
-        fetch('http://localhost:8000/api/v1/admin/health', {
+        fetch(`${backendUrl}/api/v1/admin/health`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         }),
-        fetch('http://localhost:8000/api/v1/admin/stats', {
+        fetch(`${backendUrl}/api/v1/admin/stats`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
@@ -73,7 +75,9 @@ export default function AdminPage() {
       ]);
 
       if (!healthRes.ok || !statsRes.ok) {
-        throw new Error('Failed to fetch admin data');
+        const errorText = !healthRes.ok ? await healthRes.text() : await statsRes.text();
+        console.error('API Error:', errorText);
+        throw new Error(`Failed to fetch admin data: ${!healthRes.ok ? 'health' : 'stats'} endpoint returned ${!healthRes.ok ? healthRes.status : statsRes.status}`);
       }
 
       const healthData = await healthRes.json();
@@ -83,7 +87,8 @@ export default function AdminPage() {
       setStats(statsData);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      console.error('Admin page error:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error occurred');
     } finally {
       setLoading(false);
     }
@@ -156,8 +161,8 @@ export default function AdminPage() {
       {/* Page Controls */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-white mb-2">System Health Monitoring</h2>
-          <p className="text-gray-400">Real-time system status and metrics</p>
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">System Health Monitoring</h2>
+          <p className="text-gray-300">Real-time system status and metrics</p>
         </div>
         <label className="flex items-center gap-2 text-sm text-gray-300">
           <input
@@ -175,8 +180,8 @@ export default function AdminPage() {
             <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 mb-8">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-bold text-white mb-2">System Status</h2>
-                  <p className="text-sm text-gray-400">
+                  <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">System Status</h2>
+                  <p className="text-sm text-gray-300">
                     Last updated: {new Date(health.timestamp).toLocaleTimeString()}
                   </p>
                 </div>
@@ -198,7 +203,7 @@ export default function AdminPage() {
               <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-400">Total Users</p>
+                    <p className="text-sm text-gray-300">Total Users</p>
                     <p className="text-3xl font-bold text-white">{stats.total_users}</p>
                   </div>
                   <div className="text-4xl">👥</div>
@@ -208,7 +213,7 @@ export default function AdminPage() {
               <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-400">Total Strategies</p>
+                    <p className="text-sm text-gray-300">Total Strategies</p>
                     <p className="text-3xl font-bold text-white">{stats.total_strategies}</p>
                   </div>
                   <div className="text-4xl">📋</div>
@@ -240,7 +245,7 @@ export default function AdminPage() {
           {/* Health Check Cards */}
           {health && (
             <div>
-              <h2 className="text-xl font-bold text-white mb-4">Health Checks</h2>
+              <h2 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">Health Checks</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {health.checks.map((check, index) => (
                   <div key={index} className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6">

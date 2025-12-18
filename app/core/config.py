@@ -22,6 +22,11 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 480  # 8 hours
     
+    # Zerodha Kite Connect
+    ZERODHA_API_KEY: str = "b77zgttqzmcbrghz"
+    ZERODHA_API_SECRET: str = "pd0ix4lcrcqde43suo93ouaj5s2kcfae"
+    ZERODHA_REDIRECT_URI: str = "http://localhost:8000/api/v1/broker/zerodha/callback"
+    
     # CORS
     ALLOWED_ORIGINS: list = [
         "http://localhost:3000",
