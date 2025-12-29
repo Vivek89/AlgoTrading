@@ -42,6 +42,7 @@ async def create_strategy(
         user_id=user.id,
         name=strategy.name,
         strategy_type=strategy.strategy_type,
+        instrument=strategy.instrument,
         config=strategy.config,
         risk_management=strategy.risk_management,
     )
@@ -53,6 +54,7 @@ async def create_strategy(
         id=new_strategy.id,
         name=new_strategy.name,
         strategy_type=new_strategy.strategy_type,
+        instrument=new_strategy.instrument,
         config=new_strategy.config,
         risk_management=new_strategy.risk_management,
         is_active=new_strategy.is_active,
@@ -86,6 +88,7 @@ async def list_strategies(
             id=s.id,
             name=s.name,
             strategy_type=s.strategy_type,
+            instrument=s.instrument,
             config=s.config,
             risk_management=s.risk_management,
             is_active=s.is_active,
@@ -127,6 +130,7 @@ async def get_strategy(
         id=strategy.id,
         name=strategy.name,
         strategy_type=strategy.strategy_type,
+        instrument=strategy.instrument,
         config=strategy.config,
         risk_management=strategy.risk_management,
         is_active=strategy.is_active,
@@ -166,6 +170,7 @@ async def update_strategy(
     # Update fields
     strategy.name = strategy_update.name
     strategy.strategy_type = strategy_update.strategy_type
+    strategy.instrument = strategy_update.instrument
     strategy.config = strategy_update.config
     strategy.risk_management = strategy_update.risk_management
     strategy.updated_at = datetime.utcnow()
@@ -177,6 +182,7 @@ async def update_strategy(
         id=strategy.id,
         name=strategy.name,
         strategy_type=strategy.strategy_type,
+        instrument=strategy.instrument,
         config=strategy.config,
         risk_management=strategy.risk_management,
         is_active=strategy.is_active,

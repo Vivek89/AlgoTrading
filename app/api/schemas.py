@@ -32,6 +32,7 @@ class StrategyCreate(BaseModel):
     """Create a new strategy"""
     name: str
     strategy_type: str
+    instrument: str = "NIFTY"
     config: dict = {}
     risk_management: Optional[dict] = None
 
@@ -41,6 +42,7 @@ class StrategyResponse(BaseModel):
     id: UUID
     name: str
     strategy_type: str
+    instrument: str
     config: dict
     risk_management: Optional[dict] = None
     is_active: bool

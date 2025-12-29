@@ -77,7 +77,9 @@ export default function StrategiesPage() {
       const payload = {
         name: data.name,
         strategy_type: data.strategyType,
+        instrument: data.config.instrument || 'NIFTY',
         config: data.config,
+        risk_management: data.riskManagement || null,
       }
 
       const url = editingStrategy
